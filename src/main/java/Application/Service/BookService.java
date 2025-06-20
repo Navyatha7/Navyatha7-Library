@@ -33,9 +33,27 @@ public class BookService {
     }
 
     /**
-     * Add a new book to the database
+     * Add a new book. Returns null if:
+     * - input is invalid,
+     * - book with the same ISBN already exists,
+     * - or DAO insertion fails.
      */
     public Book addBook(Book book) {
+        // Validate input
+        if (book == null ||
+            book.getIsbn() <= 0 ||
+            book.getAuthor_id() <= 0 ||
+            book.getTitle() == null || book.getTitle().trim().isEmpty()) {
+            return null;
+        }
+
+        // Check if book with the same ISBN already exists
+        Book existing = bookDAO.getBookByIsbn(book.getIsbn());
+        if (existing != null) {
+            return null; // Don't insert duplicate
+        }
+
+        // Attempt to insert
         return bookDAO.insertBook(book);
     }
 
